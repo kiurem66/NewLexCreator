@@ -7,6 +7,7 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  * The entry point of the Spring Boot application.
@@ -16,11 +17,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  */
 @SpringBootApplication
-@Theme(value = "lextalionischaractercreator", variant = Lumo.DARK)
-@PWA(name = "Lextalionis Character Creator", shortName = "Lextalionis Character Creator", offlineResources = {})
+@NpmPackage(value = "@fontsource/titillium-web", version = "4.5.0")
+@Theme(value = "lextalionischaractercreatorweb", variant = Lumo.DARK)
+@PWA(name = "LextalionisCharacterCreatorWeb", shortName = "LextalionisCharacterCreatorWeb", offlineResources = {})
 @NpmPackage(value = "line-awesome", version = "1.3.0")
-@NpmPackage(value = "@vaadin-component-factory/vcf-nav", version = "1.0.6")
-public class Application implements AppShellConfigurator {
+public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
