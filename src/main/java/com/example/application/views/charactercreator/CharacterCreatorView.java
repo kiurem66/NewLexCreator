@@ -34,7 +34,7 @@ import com.lextalionis.Character;
 import com.lextalionis.*;
 
 @PageTitle("LexCharacterCreator")
-@Route(value = "/r")
+@Route(value = "/")
 public class CharacterCreatorView extends VerticalLayout {
 
     private class SkillElement extends FormLayout{
