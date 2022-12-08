@@ -38,7 +38,7 @@ public class CharacterCard extends ListItem {
         Button edit = new Button("Modifica");
         edit.addClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("character", character);
-            UI.getCurrent().getPage().setLocation("/editor");
+            UI.getCurrent().getPage().setLocation("/");
         });
         //formLayout.add(view);
         formLayout.add(edit);

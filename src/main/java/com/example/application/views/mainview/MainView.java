@@ -22,7 +22,7 @@ public class MainView extends Main{
     public MainView(){
         addClassNames("main-view", "max-w-screen-lg", "mx-auto", "pb-l", "px-l");
         if(VaadinSession.getCurrent().getAttribute("user") == null){
-            UI.getCurrent().getPage().setLocation("/");
+            UI.getCurrent().getPage().setLocation("/login");
         }
         VaadinSession.getCurrent().setAttribute("character", null);
         user = (User) VaadinSession.getCurrent().getAttribute("user");
@@ -51,7 +51,7 @@ public class MainView extends Main{
             Button edit = new Button("Vai all'editor");
             edit.addClickListener(e -> {
                 VaadinSession.getCurrent().setAttribute("character", null);
-                UI.getCurrent().getPage().setLocation("/editor");
+                UI.getCurrent().getPage().setLocation("/");
             });
             v.add(edit);
         }
@@ -65,7 +65,7 @@ public class MainView extends Main{
         Button nuovo = new Button("Crea nuovo personaggio");
         nuovo.addClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("character", null);
-            UI.getCurrent().getPage().setLocation("/editor");
+            UI.getCurrent().getPage().setLocation("/");
         });
         hl.add(nuovo);
         imageContainer.add(hl);

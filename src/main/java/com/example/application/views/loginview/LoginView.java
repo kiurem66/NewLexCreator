@@ -15,7 +15,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 @PageTitle("LexCharacterCreator")
-@Route(value = "/")
+@Route(value = "/login")
 public class LoginView extends VerticalLayout{
     public LoginView(){
         setAlignItems(Alignment.CENTER);
@@ -49,7 +49,7 @@ public class LoginView extends VerticalLayout{
         Button edit = new Button("Vai all'editor");
         edit.addClickListener(e -> {
             VaadinSession.getCurrent().setAttribute("character", null);
-            UI.getCurrent().getPage().setLocation("/editor");
+            UI.getCurrent().getPage().setLocation("/");
         });
         add(edit);
     }
