@@ -192,18 +192,27 @@ public class CharacterCreatorView extends VerticalLayout {
         });
         formLayout.add(name);
 
-        TextField path = new TextField("Sentiero");
+        List<String> p = Arrays.asList("Sentiero dell'Umanità Discendente", "Sentiero della Notte", "Sentiero della Metamorfosi", "Sentiero di Caino", "Sentiero dei Catari", "Sentiero del Cuore Ferino", "Sentiero dell'Onorevole accordo",
+                "Sentiero del Potere e Voce Interiore", "Sentiero della Morte dell'Anima", "Sentiero di Lilith", "Sentiero del Cuore Arso", "Sentiero del Focus Interiore", "Sentiero di Orione", "Sentiero dell'Estasi", "Sentiero della notte fredda", "Sentiero del Trono Nero");
+        Select<String> path = new Select<>();
+        path.setItems(p);
+        path.setLabel("Sentiero");
         path.addValueChangeListener(e -> {
             character.setSentiero(path.getValue());
         });
         path.setValue(character.getSentiero());
         formLayout.add(path);
 
-        TextField faz = new TextField("Fazione");
+        List<String> f = Arrays.asList("Nessuna", "Moderati", "Ultraconservatori", "Lealisti", "Status Quo", "Ortodossi", "Ordine di San Biagio", "Mano nera", "Inquisizione");
+        Select<String> faz = new Select<>();
+        faz.setItems(f);
+        faz.setLabel("Fazione");
         faz.addValueChangeListener(e -> {
-            character.setFazione(faz.getValue());
+            if(faz.getValue().equals("Nessuna")) character.setFazione("");
+            else character.setFazione(faz.getValue());
         });
         faz.setValue(character.getFazione());
+        if(faz.getValue().equals("")) faz.setValue("Nessuna");
         formLayout.add(faz);
 
         ArrayList<String> list = new ArrayList<String>();
