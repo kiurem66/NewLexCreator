@@ -20,14 +20,8 @@ public class XLS {
     @NotNull
     public static ByteArrayOutputStream export(Character character) throws IOException, URISyntaxException {
         File f = null;
-        try{
-            String path=XLS.class.getClassLoader().getResource("/template.xlsx").toURI().toString();
-            f = new File(path);
-        }catch (Exception e){
-            String path="/template.xlsx";
-        }
-
-
+        String path="/template.xlsx";
+        f = new File(path);
         InputStream is = new FileInputStream(f);
         XSSFWorkbook wb = new XSSFWorkbook(is);
         XSSFSheet sheet = wb.getSheet("Scheda");
