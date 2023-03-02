@@ -19,10 +19,7 @@ public class XLS {
 
     @NotNull
     public static ByteArrayOutputStream export(Character character) throws IOException, URISyntaxException {
-        File f = null;
-        String path="/template.xlsx";
-        f = new File(path);
-        InputStream is = new FileInputStream(f);
+        InputStream is = XLS.class.getClassLoader().getResourceAsStream("BOOT-INF/classes/template.xlsx");
         XSSFWorkbook wb = new XSSFWorkbook(is);
         XSSFSheet sheet = wb.getSheet("Scheda");
         writeToCell(sheet, 0, 5, character.getName());
