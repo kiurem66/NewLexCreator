@@ -1,7 +1,6 @@
 package com.lextalionis;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
@@ -9,14 +8,20 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.validation.constraints.NotNull;
+
 public class XLS {
 
     private XLS() {
     }
 
 
+    @NotNull
     public static ByteArrayOutputStream export(Character character) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook(XLS.class.getResourceAsStream("media/template.xlsx"));
+        String path=XLS.class.getResource("/template.xlsx").getFile();
+        File f = new File(path);
+        InputStream is = new FileInputStream(f);
+        XSSFWorkbook wb = new XSSFWorkbook(is);
         XSSFSheet sheet = wb.getSheet("Scheda");
         writeToCell(sheet, 0, 5, character.getName());
         writeToCell(sheet, 1, 0, character.getBlood());
