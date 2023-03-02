@@ -18,7 +18,7 @@ public class XLS {
 
     @NotNull
     public static ByteArrayOutputStream export(Character character) throws IOException {
-        String path=XLS.class.getResource("/template.xlsx").getFile();
+        String path=XLS.class.getClassLoader().getResource("/template.xlsx").getFile();
         File f = new File(path);
         InputStream is = new FileInputStream(f);
         XSSFWorkbook wb = new XSSFWorkbook(is);
