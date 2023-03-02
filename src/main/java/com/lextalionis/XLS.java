@@ -1,6 +1,7 @@
 package com.lextalionis;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.CellCopyPolicy;
@@ -17,9 +18,16 @@ public class XLS {
 
 
     @NotNull
-    public static ByteArrayOutputStream export(Character character) throws IOException {
-        String path=XLS.class.getClassLoader().getResource("/template.xlsx").getFile();
-        File f = new File(path);
+    public static ByteArrayOutputStream export(Character character) throws IOException, URISyntaxException {
+        File f = null;
+        try{
+            String path=XLS.class.getClassLoader().getResource("/template.xlsx").toURI().toString();
+            f = new File(path);
+        }catch (Exception e){
+            String path="/template.xlsx";
+        }
+
+
         InputStream is = new FileInputStream(f);
         XSSFWorkbook wb = new XSSFWorkbook(is);
         XSSFSheet sheet = wb.getSheet("Scheda");

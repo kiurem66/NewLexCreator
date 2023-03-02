@@ -25,6 +25,7 @@ import com.vaadin.flow.server.VaadinSession;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -146,6 +147,8 @@ public class CharacterCreatorView extends VerticalLayout {
             bis = new ByteArrayInputStream(XLS.export(character).toByteArray());
         } catch (IOException e1) {
             e1.printStackTrace();
+        } catch (URISyntaxException e2){
+            e2.printStackTrace();
         }
         return bis;
     }
