@@ -1,10 +1,13 @@
-package com.example.application.views.charactercreator;
+package com.example.application.views.charactercalc;
 
+import com.lextalionis.Character;
+import com.lextalionis.*;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
@@ -21,7 +24,6 @@ import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,23 +33,20 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import com.lextalionis.Character;
-import com.lextalionis.*;
-
 @PageTitle("LexCharacterCreator")
-@Route(value = "/")
-public class CharacterCreatorView extends VerticalLayout {
+@Route(value = "/calc")
+public class CharacterCalcView extends VerticalLayout {
 
     private class SkillElement extends FormLayout{
         private Component left;
         private Label name;
         private NumberField level;
         private int type; //0: influenza, 1 disciplina, 2 stile
-    
+
         public SkillElement(Skill skill){
 
             setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 2)
+                new ResponsiveStep("0", 2)
             );
             this.name = new Label(skill.getName());
             if(skill instanceof Influenza)
@@ -81,13 +80,13 @@ public class CharacterCreatorView extends VerticalLayout {
             level.setValue(((double)(skill.getLevel())));
             level.setMin(0.0);
             level.setStep(1.0);
-            level.setHasControls(true);  
+            level.setHasControls(true);
             level.setMax(5);
-            if(type==2) level.setMax(3);    
+            if(type==2) level.setMax(3);
             level.addValueChangeListener(e -> {
                 skill.setLevel(level.getValue().intValue());
                 updateBloodWillPx();
-            }); 
+            });
             HorizontalLayout hl = new HorizontalLayout();
             hl.add(left);
             hl.add(name);
@@ -95,7 +94,7 @@ public class CharacterCreatorView extends VerticalLayout {
             add(level);
         }
     }
-    
+
     private class ProConElement extends FormLayout{
         Label name;
         Label cost;
@@ -104,7 +103,7 @@ public class CharacterCreatorView extends VerticalLayout {
 
         public ProConElement(ProCon proCon){
             setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 4)
+                new ResponsiveStep("0", 4)
             );
             name = new Label(proCon.nome());
             left = new Button("-");
@@ -114,7 +113,7 @@ public class CharacterCreatorView extends VerticalLayout {
                 updateSkills();
             });
             int c = proCon.costo();
-            type = new Label("pre");    
+            type = new Label("pre");
             if(c < 0){
                 type = new Label("dif");
                 c = -c;
@@ -126,12 +125,11 @@ public class CharacterCreatorView extends VerticalLayout {
             add(cost);
         }
     }
-    
+
     private Character character;
     private Character old_chara;
     private Select<String> gen;
     private NumberField px;
-    private Label pxrim;
     private Label bloodWill;
     private VerticalLayout disc;
     private VerticalLayout infl;
@@ -140,6 +138,7 @@ public class CharacterCreatorView extends VerticalLayout {
     private FormLayout formLayout;
     private ProConSelector pSelector;
     private TextArea descrizione;
+    private int pxInScheda = 0;
 
     InputStream Filefactory(){
         ByteArrayInputStream bis = null;
@@ -153,20 +152,15 @@ public class CharacterCreatorView extends VerticalLayout {
         return bis;
     }
 
-    
-    
-    
-    public CharacterCreatorView(){
+
+
+
+    public CharacterCalcView(){
         formLayout = new FormLayout();
         VerticalLayout ver = new VerticalLayout();
         ver.setAlignItems(Alignment.CENTER);
         H2 title = new H2("Lextalionis Character Creator");
         ver.add(title);
-        Button bn = new Button("Calcola i px per un nuovo personaggio");
-        bn.addClickListener(e -> {
-            UI.getCurrent().getPage().setLocation("/calc");
-        });
-        ver.add(bn);
         add(ver);
 
         formLayout.setResponsiveSteps(
@@ -254,7 +248,7 @@ public class CharacterCreatorView extends VerticalLayout {
             }
             character.setName(name.getValue());
             character.setSentiero(path.getValue());
-            character.setPx(px.getValue().intValue());
+            character.setPx(0);
             if(character.toChoosInfl()){
                 chooseInfl(true);
             }
@@ -283,14 +277,14 @@ public class CharacterCreatorView extends VerticalLayout {
         });
         formLayout.add(gen);
 
-        px = new NumberField("PX");
-        px.setValue((double)character.getPx());
+        px = new NumberField("PX non usati");
+        px.setValue(1.0);
         px.setStep(1.0);
         px.setHasControls(true);
         px.setMin(1);
         px.setMax(1000);
         px.addValueChangeListener(e -> {
-            character.setPx(px.getValue().intValue());
+            pxInScheda = px.getValue().intValue();
             updateBloodWillPx();
         });
         formLayout.add(px);
@@ -431,67 +425,20 @@ public class CharacterCreatorView extends VerticalLayout {
         descrDiv.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
         add(descrDiv);
 
-        pxrim = new Label("PX: 30");
         bloodWill = new Label("Sangue: 10 Will: 7");
         updateBloodWillPx();
-        add(pxrim);
         add(bloodWill);
 
-        HorizontalLayout buttonWrap = new HorizontalLayout();
-        Button b = new Button("Esporta come scheda");
+        Button b = new Button("Calcola i px");
         b.addClickListener(e -> {
-            StreamResource sr = new StreamResource("Scheda.xlsx", () -> Filefactory());
-            StreamRegistration registration = VaadinSession.getCurrent().getResourceRegistry().registerResource(sr);
-            UI.getCurrent().getPage().open(registration.getResourceUri().toString());
-            
+            int charPX = (-character.getRemainingPx()) + pxInScheda;
+            int newPX = ((-character.getRemainingPx()) -30 + pxInScheda)/2;
+            ConfirmDialog dialog = new ConfirmDialog();
+            dialog.setText("Il personaggio ha in scheda " + charPX + " PX, il nuovo personaggio inizierà con " + newPX + " PX in più");
+            dialog.setConfirmText("OK");
+            dialog.open();
         });
-        buttonWrap.add(b);
-
-        if(VaadinSession.getCurrent().getAttribute("user") != null){
-            Button salva = new Button("Salva");
-            salva.addClickListener(e -> {
-                User user = (User)VaadinSession.getCurrent().getAttribute("user");
-                if(old_chara != null){
-                    user.delChara(old_chara);
-                }
-                user.addChara(character);
-                DBManager.getInstance().save(user);
-                UI.getCurrent().getPage().setLocation("/main");
-            });
-            buttonWrap.add(salva);
-            
-        }
-        add(buttonWrap);
-        
-        if(old_chara != null){
-            Button delete = new Button("Elimina personaggio");
-            delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            delete.addClickListener(e -> {
-                Dialog dialog = new Dialog();
-                String text = "Sei sicuro di voler eliminare " + character.getName() + "?";
-                VerticalLayout vl = new VerticalLayout();
-                dialog.add(vl);
-                vl.add(text);
-                HorizontalLayout hl = new HorizontalLayout();
-                vl.add(hl);
-                Button conferma = new Button("Elimina personaggio");
-                conferma.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                conferma.addClickListener(ev -> {
-                    User user = (User)VaadinSession.getCurrent().getAttribute("user");
-                    user.delChara(old_chara);
-                    DBManager.getInstance().save(user);
-                    UI.getCurrent().getPage().setLocation("/main");
-                });
-                hl.add(conferma);
-                Button annulla = new Button("Annulla");
-                annulla.addClickListener(ev -> {
-                    dialog.close();
-                });
-                hl.add(annulla);
-                dialog.open();
-            });
-            add(delete);
-        }
+        add(b);
     }
 
     private void chooseProcon(boolean pro){
@@ -548,7 +495,6 @@ public class CharacterCreatorView extends VerticalLayout {
     }
 
     private void updateBloodWillPx(){
-        pxrim.setText("PX: " + character.getRemainingPx());
         bloodWill.setText("Sangue: " + character.getBlood() + " Will: " + character.getWill());
     }
 
